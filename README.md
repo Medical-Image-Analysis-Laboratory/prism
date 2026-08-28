@@ -18,6 +18,12 @@ down with it.
 **PRISM** breaks that feedback loop by putting a *learned anatomical prior*
 inside the SVR loop. One forward pass alternates
 
+<!-- add overview figure below -->
+<div align="center">
+<img src="imgs/overeview.pdf" width="80%" alt="PRISM overview" />
+</div>
+
+
 1. **motion estimation** — a transformer (SVoRT backbone) predicts a pose update
    from the acquired slices and the current volume estimate;
 2. **prior-regularized reconstruction** — a data-consistency CG solve, a residual
