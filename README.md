@@ -47,10 +47,6 @@ improves slice-level reconstruction consistency on 170 clinical fetal scans.
 
 </div>
 
-> The Python package is called `synthgen`: this code base grew out of the
-> synthetic fetal-MRI stack generator that produces PRISM's training data, and
-> the package name is kept so that published checkpoints stay loadable.
-
 ---
 
 ## Contents
