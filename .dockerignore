@@ -1,0 +1,19 @@
+.git
+.github
+**/__pycache__
+**/*.pyc
+*.so
+build/
+.cuda_build/
+dist/
+*.egg-info/
+logs/
+outputs/
+predictions/
+weights/
+wandb/
+docs/
+analysis/results/cache/
+analysis/results/*_metrics.csv
+# The demo BIDS volumes (~70 MB) are not needed to run inference.
+data/

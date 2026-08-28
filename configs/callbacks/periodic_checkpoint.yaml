@@ -1,0 +1,16 @@
+# https://lightning.ai/docs/pytorch/stable/api/lightning.pytorch.callbacks.ModelCheckpoint.html
+# Rolling periodic checkpoint: a single file overwritten every N epochs,
+# saved IN ADDITION to the best-k checkpoints handled by `model_checkpoint`.
+
+periodic_checkpoint:
+  _target_: lightning.pytorch.callbacks.ModelCheckpoint
+  dirpath: null # directory to save the model file
+  filename: null # checkpoint filename
+  monitor: null # no metric -> not tied to "best"; always keeps the most recent
+  verbose: False
+  save_last: null
+  save_top_k: 1 # keep only one file; combined with a fixed filename it overwrites
+  save_weights_only: False
+  every_n_train_steps: null # number of training steps between checkpoints
+  every_n_epochs: null
+  save_on_train_epoch_end: null

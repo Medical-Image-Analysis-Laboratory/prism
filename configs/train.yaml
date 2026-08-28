@@ -1,0 +1,62 @@
+defaults:
+  - _self_
+  # important configs defining data and model
+  - data: datamodule
+  - model: srrsvortreg
+  # configs defining logging and callbacks
+  - callbacks: default
+  - logger: wandb
+  - trainer: default
+  - paths: default
+  - extras: default
+  - hydra: default
+
+  # experiment configs allow for version control of specific hyperparameters
+  # e.g. best hyperparameters for given model and datamodule
+  - experiment: null
+
+  # config for hyperparameter optimization
+  - hparams_search: null
+
+  # optional local config for machine/user specific settings
+  # it's optional since it doesn't need to exist and is excluded from version control
+  - optional local: default
+
+  # debugging config (enable through command line, e.g. `python train.py debug=default)
+  - debug: null
+
+task_name: "default_test"
+
+# set False to skip model training
+train: True
+
+# evaluate on test set, using best model weights achieved during training
+# lightning chooses best weights based on the metric specified in checkpoint callback
+test: False
+
+# simply provide checkpoint path to resume training
+ckpt_path: null
+
+# how to use ckpt_path:
+#   "resume"  -> full checkpoint resume (model + optimizer + scheduler + step)
+#   "weights" -> load only the model state_dict (non-strict) + fresh optimizer;
+#                use when the architecture changed (e.g. a new head was added)
+ckpt_load_mode: resume
+
+# learning-rate finder: run Lightning's Tuner.lr_find (LR range test) before
+# training and set model.lr to the suggestion. Enable with `tune_lr.enable=true`.
+# Runs on the freshly-instantiated model (before any ckpt resume), so use it to
+# pick a starting LR for a given architecture rather than mid-fine-tuning.
+tune_lr:
+  enable: false
+  min_lr: 1.0e-6
+  max_lr: 1.0e-2
+  num_training: 50        # number of LR steps in the range test
+  mode: exponential        # "exponential" or "linear"
+  update_attr: true        # write the suggestion into model.lr before fit
+  plot_path: ${paths.output_dir}/lr_find.png  # set null to skip saving the plot
+
+# seed for random number generators in pytorch, numpy and python.random
+seed: null
+
+tags: ['dev']

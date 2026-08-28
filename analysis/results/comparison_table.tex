@@ -1,0 +1,23 @@
+\begin{tabular}{llccccccccc}
+\toprule
+Split & Method & \multicolumn{3}{c}{Motion $\downarrow$} & \multicolumn{3}{c}{Slice $\uparrow$} & \multicolumn{3}{c}{Volume $\uparrow$} \\
+\cmidrule(lr){3-5}\cmidrule(lr){6-8}\cmidrule(lr){9-11}
+ &  & Point & Trans & Rot & NCC & PSNR & SSIM & NCC & PSNR & SSIM \\
+ &  & (mm) & (mm) & (deg) &  & (dB) &  &  & (dB) &  \\
+\midrule
+\multirow{4}{*}{Good} & PRISM (+4CG) & 5.62 {\tiny$\pm$2.00} & 2.72 {\tiny$\pm$1.20} & 4.70 {\tiny$\pm$1.07} & 0.969 {\tiny$\pm$0.015} & 33.39 {\tiny$\pm$2.27} & 0.956 {\tiny$\pm$0.024} & 0.819 {\tiny$\pm$0.073} & 22.86 {\tiny$\pm$2.16} & 0.851 {\tiny$\pm$0.047} \\
+ & PRISM (+Reg) & \underline{5.08} {\tiny$\pm$2.11} & \underline{2.39} {\tiny$\pm$0.97} & \underline{4.19} {\tiny$\pm$1.13} & \underline{0.976} {\tiny$\pm$0.012} & \underline{34.96} {\tiny$\pm$2.15} & \underline{0.966} {\tiny$\pm$0.017} & \underline{0.873} {\tiny$\pm$0.039} & \underline{24.14} {\tiny$\pm$2.00} & \underline{0.890} {\tiny$\pm$0.028} \\
+ & PRISM (+Quality) & 5.37 {\tiny$\pm$2.23} & 2.73 {\tiny$\pm$1.19} & 4.42 {\tiny$\pm$1.05} & 0.970 {\tiny$\pm$0.014} & 33.76 {\tiny$\pm$2.27} & 0.958 {\tiny$\pm$0.022} & 0.838 {\tiny$\pm$0.056} & 23.20 {\tiny$\pm$2.09} & 0.863 {\tiny$\pm$0.039} \\
+ & \textbf{PRISM (+Quality+Reg)} & \textbf{4.25}$^{*}$ {\tiny$\pm$2.01} & \textbf{2.01}$^{*}$ {\tiny$\pm$1.07} & \textbf{3.41}$^{*}$ {\tiny$\pm$0.92} & \textbf{0.979}$^{*}$ {\tiny$\pm$0.013} & \textbf{35.72}$^{*}$ {\tiny$\pm$2.12} & \textbf{0.970}$^{*}$ {\tiny$\pm$0.015} & \textbf{0.886}$^{*}$ {\tiny$\pm$0.036} & \textbf{24.60}$^{*}$ {\tiny$\pm$2.05} & \textbf{0.901}$^{*}$ {\tiny$\pm$0.027} \\
+\midrule
+\multirow{4}{*}{Med} & PRISM (+4CG) & 5.96 {\tiny$\pm$2.45} & 2.86 {\tiny$\pm$1.05} & 5.14 {\tiny$\pm$1.40} & 0.972 {\tiny$\pm$0.012} & 33.18 {\tiny$\pm$2.16} & 0.950 {\tiny$\pm$0.025} & 0.737 {\tiny$\pm$0.100} & 21.22 {\tiny$\pm$1.89} & 0.795 {\tiny$\pm$0.055} \\
+ & PRISM (+Reg) & \underline{5.28} {\tiny$\pm$2.48} & \underline{2.35} {\tiny$\pm$0.78} & \underline{4.46} {\tiny$\pm$1.21} & \underline{0.977} {\tiny$\pm$0.010} & \underline{34.41} {\tiny$\pm$2.06} & \underline{0.959} {\tiny$\pm$0.020} & \underline{0.812} {\tiny$\pm$0.072} & \underline{22.44} {\tiny$\pm$1.85} & \underline{0.844} {\tiny$\pm$0.042} \\
+ & PRISM (+Quality) & 5.63 {\tiny$\pm$2.24} & 2.81 {\tiny$\pm$1.10} & 4.83 {\tiny$\pm$1.33} & 0.972 {\tiny$\pm$0.011} & 33.46 {\tiny$\pm$2.18} & 0.952 {\tiny$\pm$0.023} & 0.766 {\tiny$\pm$0.089} & 21.63 {\tiny$\pm$1.90} & 0.816 {\tiny$\pm$0.052} \\
+ & \textbf{PRISM (+Quality+Reg)} & \textbf{4.47}$^{*}$ {\tiny$\pm$2.09} & \textbf{2.02}$^{*}$ {\tiny$\pm$0.72} & \textbf{3.73}$^{*}$ {\tiny$\pm$1.05} & \textbf{0.978}$^{*}$ {\tiny$\pm$0.010} & \textbf{34.95}$^{*}$ {\tiny$\pm$2.01} & \textbf{0.962}$^{*}$ {\tiny$\pm$0.018} & \textbf{0.831}$^{*}$ {\tiny$\pm$0.069} & \textbf{22.89}$^{*}$ {\tiny$\pm$1.89} & \textbf{0.862}$^{*}$ {\tiny$\pm$0.040} \\
+\midrule
+\multirow{4}{*}{Bad} & PRISM (+4CG) & 6.34 {\tiny$\pm$2.81} & 3.63 {\tiny$\pm$1.39} & 5.80 {\tiny$\pm$2.08} & 0.978 {\tiny$\pm$0.013} & 35.87 {\tiny$\pm$3.61} & 0.959 {\tiny$\pm$0.024} & 0.546 {\tiny$\pm$0.146} & 19.67 {\tiny$\pm$1.81} & 0.702 {\tiny$\pm$0.065} \\
+ & PRISM (+Reg) & \underline{5.46} {\tiny$\pm$3.17} & \underline{2.89} {\tiny$\pm$1.05} & \underline{4.97} {\tiny$\pm$2.25} & \textbf{0.982}$^{*}$ {\tiny$\pm$0.011} & \underline{36.52} {\tiny$\pm$3.38} & \underline{0.963} {\tiny$\pm$0.022} & \underline{0.627} {\tiny$\pm$0.129} & \underline{20.32} {\tiny$\pm$1.80} & \underline{0.740} {\tiny$\pm$0.060} \\
+ & PRISM (+Quality) & 6.06 {\tiny$\pm$2.84} & 3.54 {\tiny$\pm$1.31} & 5.65 {\tiny$\pm$2.28} & 0.977 {\tiny$\pm$0.013} & 35.68 {\tiny$\pm$3.40} & 0.958 {\tiny$\pm$0.023} & 0.567 {\tiny$\pm$0.139} & 19.81 {\tiny$\pm$1.82} & 0.711 {\tiny$\pm$0.064} \\
+ & \textbf{PRISM (+Quality+Reg)} & \textbf{4.90}$^{*}$ {\tiny$\pm$3.22} & \textbf{2.70}$^{*}$ {\tiny$\pm$1.02} & \textbf{4.49}$^{*}$ {\tiny$\pm$2.04} & \underline{0.981} {\tiny$\pm$0.011} & \textbf{36.59} {\tiny$\pm$3.14} & \textbf{0.964}$^{*}$ {\tiny$\pm$0.021} & \textbf{0.656}$^{*}$ {\tiny$\pm$0.131} & \textbf{20.63}$^{*}$ {\tiny$\pm$1.82} & \textbf{0.757}$^{*}$ {\tiny$\pm$0.063} \\
+\bottomrule
+\end{tabular}

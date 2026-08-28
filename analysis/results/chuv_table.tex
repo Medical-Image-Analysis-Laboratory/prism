@@ -1,0 +1,13 @@
+\begin{tabular}{lcccc}
+\toprule
+Method & \multicolumn{4}{c}{Slice $\uparrow$} \\
+\cmidrule(lr){2-5}
+ & NCC & PSNR & SSIM & NCC$_{\mathrm{brain}}$ \\
+ &  & (dB) &  &  \\
+\midrule
+PRISM (+4CG) & \underline{0.944} {\tiny$\pm$0.021} & 25.80 {\tiny$\pm$1.52} & 0.874 {\tiny$\pm$0.039} & \underline{0.565} {\tiny$\pm$0.113} \\
+PRISM (+Reg) & 0.942 {\tiny$\pm$0.025} & 25.82 {\tiny$\pm$1.53} & \underline{0.892} {\tiny$\pm$0.038} & 0.560 {\tiny$\pm$0.117} \\
+PRISM (+Quality) & 0.944 {\tiny$\pm$0.022} & \underline{25.84} {\tiny$\pm$1.57} & 0.876 {\tiny$\pm$0.038} & 0.548 {\tiny$\pm$0.118} \\
+\textbf{PRISM (+Quality+Reg)} & \textbf{0.945}$^{*}$ {\tiny$\pm$0.023} & \textbf{25.92}$^{*}$ {\tiny$\pm$1.44} & \textbf{0.892} {\tiny$\pm$0.038} & \textbf{0.592}$^{*}$ {\tiny$\pm$0.126} \\
+\bottomrule
+\end{tabular}

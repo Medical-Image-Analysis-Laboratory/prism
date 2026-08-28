@@ -1,0 +1,28 @@
+_target_: lightning.pytorch.trainer.Trainer
+
+default_root_dir: ${paths.output_dir}
+
+min_epochs: 500 # prevents early stopping
+max_epochs: 1015
+
+accelerator: cpu
+devices: 1
+
+# mixed precision for extra speed-up
+precision: 32
+
+# set True to to ensure deterministic results
+# makes training slower but gives more reproducibility than just setting seeds
+deterministic: False
+
+# How often to check the validation set. Pass a float in the
+# range [0.0, 1.0] to check after a fraction of the training epoch.
+# Pass an int to check after a fixed number of training batches. 
+# An int value can only be higher than the number of training batches 
+# when check_val_every_n_epoch=None, which validates after every N 
+# training batches across epochs or during iteration-based training. 
+# Default: 1.0.
+# val_check_interval: 50
+
+log_every_n_steps: 15 #  How often to log within steps. Default: 50.
+check_val_every_n_epoch: 1 # If None, validation will be done solely based on the number of training batches, requiring val_check_interval to be an integer value. Default: 1

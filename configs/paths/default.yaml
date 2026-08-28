@@ -1,0 +1,46 @@
+# path to root directory
+# this requires PROJECT_ROOT environment variable to exist
+# you can replace it with "." if you want the root to be the current working directory
+root_dir: ${oc.env:PROJECT_ROOT}
+
+# path to data directory
+data_dir: ${paths.root_dir}/data/
+
+# path to logging directory
+log_dir: ${paths.root_dir}/logs/
+
+# path to output directory, created dynamically by hydra
+# path generation pattern is specified in `configs/hydra/default.yaml`
+# use it to store all files generated during the run, like ckpts and metrics
+output_dir: ${hydra:runtime.output_dir}
+
+# path to working directory
+work_dir: ${hydra:runtime.cwd}
+
+# --------------------------------------------------------------------------- #
+#  Dataset roots
+#
+#  None of these live inside the repository: point them at your own data with
+#  the environment variables below (see README, "Data layout"), or override any
+#  of them on the command line, e.g. `paths.real_data_dir=/data/my_bids`.
+# --------------------------------------------------------------------------- #
+
+# BIDS root of the high-resolution reference SRR volumes (with a
+# `participants.csv` next to the `sub-*` folders) that the scanner simulation
+# samples the training / test stacks from.
+train_data_dir: ${oc.env:PRISM_TRAIN_DATA,${paths.root_dir}/data}
+
+# Root holding the simulated test datasets, one BIDS folder per ill-posedness
+# level: `<sim_test_dir>/{Good,Med,Bad}` (written by generate_stack_database).
+sim_test_dir: ${oc.env:PRISM_SIM_TEST_DATA,${paths.root_dir}/data/simulated_test}
+
+# Root of a real (clinical) BIDS dataset of acquired 2D stacks.
+real_data_dir: ${oc.env:PRISM_REAL_DATA,${paths.root_dir}/data/real}
+
+# Where inference writes reconstructions, motion parameters and metrics.
+predictions_dir: ${oc.env:PRISM_PREDICTIONS,${paths.root_dir}/predictions}
+
+# MedicalNet ResNet-10 weights used by the 3D perceptual loss (TRAINING ONLY --
+# inference never touches them). Download from
+# https://github.com/Warvito/MedicalNet-models
+medicalnet_weights: ${oc.env:MEDICALNET_WEIGHTS,${paths.root_dir}/weights/resnet_10_23dataset.pth}

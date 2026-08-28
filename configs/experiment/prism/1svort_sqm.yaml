@@ -1,0 +1,145 @@
+# @package _global_
+
+
+defaults:
+  - override /data: datamodule
+  - override /model: srrsvortreg
+  - override /callbacks: default
+  - override /trainer: gpu
+
+task_name: 1svort_sqm
+
+model:
+  n_iter: 3
+  cg_iter: 2
+  freezesvr: false
+  freezerreg: false
+  freezesqm: true
+
+  sqm:
+    _target_: "synthgen.models.sbqm.QualityNet"
+
+  # 3D perceptual loss on the last-iteration reconstruction, to counter the
+  # over-smoothing of a pure L1 image loss (MONAI PerceptualLoss, MedicalNet
+  # ResNet-10 backbone). Set to null to train without it.
+  perceptual_loss:
+    _target_: monai.losses.PerceptualLoss
+    spatial_dims: 3
+    pretrained_path: ${paths.medicalnet_weights}
+    network_type: "medicalnet_resnet10_23datasets"
+    is_fake_3d: False
+    pretrained: True
+
+  lr: 5.0e-5
+
+  # Supervised loss (Eq. 9): anchor-point + rotation/translation on the pose and
+  # smooth-L1 on the reconstruction, every term SUMMED over the registration
+  # iterations (deep supervision), as in the reference SVoRT implementation.
+  weight_point: 0.1
+  weight_img: 500.0
+  weight_qa: 0.0        # dense QA supervised against the GT artifact map
+  weight_R: 10.0
+  weight_T: 0.01
+
+  # Bias-field and intensity-scale heads are unsupervised here (weight 0): the
+  # simulated artefacts are left uncorrected and the SQM down-weights them.
+  weight_intshift: 0.0
+  weight_bias: 0.0
+
+  # Self-supervised terms: off, the simulated data comes with full ground truth.
+  weight_dc: 0.0
+  weight_qa_reg: 0.0
+  qa_target: 0.0
+  weight_tv: 0.0
+  weight_perceptual: 500.0
+  weight_gradloss: 0.0
+
+  # MoDL proximal weight mu_k = softplus(lambda_k) (data-consistency vs prior
+  # balance), learned, one per registration iteration.
+  reg_lambda_init: 0.5
+  n_reg_lambda: null
+
+  # The learned prior: one residual 3D denoiser per registration iteration
+  # (untied). `null` disables it, which is the SVoRT / SVoRT(+Q) ablation.
+  regularizer: null
+data:
+  train_type: real
+  val_type: real
+
+  scanner:
+    _target_: synthgen.generator.scanner.Scanner
+    cfg_scanner:
+      resolution_slice_fac: [1.0, 2.0]
+      resolution_slice_max: 2.0
+      slice_thickness: [2.5, 5.0]
+      gap: [2.5, 5.0]
+      resolution_recon: 1.0
+      min_num_stack: 1
+      max_num_stack: 4
+      max_num_slices: 400
+      noise_sigma: [0.0, 0.03]
+      TR: [1, 2]
+      prob_void: 0.15
+      # Probability of an intra-slice motion artefact. Inter-slice pose motion
+      # is always simulated, from recorded fetal-motion trajectories.
+      prob_motion: 0.15
+      prob_local_blur: 0.15
+     
+      max_missing_slices: 0.15
+      # Bias field and per-slice intensity scaling are simulated but left
+      # UNCORRECTED (the correction heads are off), so the model has to cope
+      # with them -- set these to 0 for artefact-free stacks.
+      bias_strength_max: 0.2
+      bias_strength_min: 0.0
+      bias_percentage_max: 0.2
+      intensity_slice_std: 0.2
+      intensity_slice_prb: 0.2
+      skull_strip: 0.5
+      slice_size: 128
+      restrict_transform: false
+      txy: 3
+
+  split_file: ${paths.train_data_dir}/participants.csv
+  bids_path: ${paths.train_data_dir}
+  seed_path: null
+
+  train_split: train
+  val_split: val
+  test_split: test
+  img_suffix: T2wbiascorrected
+  seg_suffix: dseg
+
+  num_workers: 0
+  batch_size: 1
+
+  generator:
+    resolution: [1.0, 1.0, 1.0]
+    shape: [128, 128, 128]
+    image_transforms:
+      _target_: torchio.transforms.Compose
+      transforms:
+        - _target_: torchio.transforms.RandomGamma
+          log_gamma: [-0.4, 0.4]
+          p: 1.0
+        - _target_: torchio.transforms.RescaleIntensity
+          out_min_max: [0, 1]
+
+trainer:
+  max_epochs: 4000
+  min_epochs: 1000
+  check_val_every_n_epoch: 2
+  # fp32: the proximal CG mixes the fp32 lambda parameter with the volume; full
+  # precision keeps the data-consistency solve clean and stable.
+  precision: 32
+  gradient_clip_val: 500.
+  gradient_clip_algorithm: norm
+  accumulate_grad_batches: 8
+
+# Initialisation for the end-to-end fine-tuning stage: the checkpoint assembled
+# by `scripts/assemble_init_checkpoint.py` (retrained SVoRT backbone + pre-trained
+# SQM + the pre-trained regularizer copied into every per-iteration denoiser).
+# Set it with `export PRISM_INIT_CKPT=/path/to/prism_init.ckpt` or on the command
+# line: `ckpt_path=/path/to/prism_init.ckpt`.
+ckpt_path: ${oc.env:PRISM_INIT_CKPT,null}
+
+ckpt_load_mode: weights

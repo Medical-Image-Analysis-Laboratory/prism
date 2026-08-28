@@ -1,0 +1,62 @@
+# @package _global_
+
+defaults:
+  - override /data: datamodule
+  - override /model: srrsvortreg
+  - override /callbacks: default
+  - override /trainer: gpu
+
+task_name: simrealbad
+output_dir: ${paths.sim_test_dir}/Bad
+
+data:
+  train_type: real # "synth", "real"
+  val_type: real # "synth", "real"
+
+  # data source (otherwise the datamodule's /path/to/... placeholders are used)
+  split_file: ${paths.train_data_dir}/participants.csv
+  bids_path: ${paths.train_data_dir}
+  seed_path: null
+  val_split: test
+  # BIDS suffixes of the reference volumes and their segmentations, i.e.
+  # <sub>[_<ses>]*_<suffix>.nii.gz -- adapt to your files.
+  img_suffix: T2wbiascorrected
+  seg_suffix: dseg
+
+  scanner:
+    _target_: synthgen.generator.scanner.Scanner
+    cfg_scanner:
+      resolution_slice_fac: [1.0, 2.0]
+      resolution_slice_max: 2.0
+      slice_thickness:
+        - 2.5
+        - 5.0
+      gap:
+        - 2.5
+        - 5.0
+      resolution_recon: 1.0
+      min_num_stack: 1
+      max_num_stack: 3
+      max_num_slices: 100
+      noise_sigma:
+        - 0.0
+        - 0.03
+      TR:
+        - 1
+        - 2
+      # artifacts
+      prob_void: 0.3
+      prob_motion: 0.2
+      max_missing_slices: 0.3
+      # bias field parameters
+      bias_strength_max: 0.2
+      bias_strength_min: 0.05
+      bias_percentage_max: 0.5
+      # intensity shift parameters
+      intensity_slice_std: 0.3
+      intensity_slice_prb: 0.2
+
+      skull_strip: 1.0 # false by default 
+      slice_size: 128
+      restrict_transform: false
+      txy: 3

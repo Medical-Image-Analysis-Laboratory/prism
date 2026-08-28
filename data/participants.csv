@@ -1,0 +1,4 @@
+participant_id,splits
+sub-sta21,train
+sub-sta30,val
+sub-sta38,test

@@ -1,0 +1,34 @@
+defaults:
+  - model_checkpoint
+  - periodic_checkpoint
+  # - early_stopping
+  - model_summary
+  - rich_progress_bar
+  - lr_monitor
+  - _self_
+
+model_checkpoint:
+  dirpath: ${paths.output_dir}/checkpoints
+  filename: "epoch_{epoch:03d}_val_loss_{loss_total/val:.4f}_step_{step}"
+  monitor: "loss_total/val"
+  mode: "min"
+  save_last: False
+  auto_insert_metric_name: False
+
+# Rolling checkpoint: overwrites a single file every 10 epochs,
+# kept in addition to the best-3 saved by `model_checkpoint` above.
+periodic_checkpoint:
+  dirpath: ${paths.output_dir}/checkpoints
+  filename: "periodic_latest"
+  every_n_epochs: 10
+  save_top_k: 1
+  auto_insert_metric_name: False
+
+
+early_stopping:
+  monitor: "loss_total/val"
+  patience: 500
+  mode: "min"
+
+model_summary:
+  max_depth: 1

@@ -1,0 +1,50 @@
+# Config for synthgen/generate_stack_database.py
+#
+# Builds a BIDS database of *simulated* stacks for the subjects of a split
+# (the validation split by default) using the experiment's `data` attribute
+# (its scanner + generator + bids_path). No model/checkpoint is involved -
+# this is pure forward simulation, mirroring how SynthDataset feeds the model
+# during training/evaluation (see synthgen/inference.py).
+#
+# Usage example:
+#   python -m synthgen.generate_stack_database \
+#       experiment=datagen/simrealbad
+#
+# Inherits the same defaults as train.yaml so that `experiment=` overrides work.
+
+defaults:
+  - _self_
+  - data: datamodule
+  - model: srrsvortreg
+  - callbacks: default
+  - logger: wandb
+  - trainer: default
+  - paths: default
+  - extras: default
+  - hydra: default
+  - experiment: null
+  - hparams_search: null
+  - optional local: default
+  - debug: null
+
+# required override: where to write the BIDS database
+output_dir: ???
+
+# which split's subjects to simulate. Defaults to the experiment's val split.
+split: ${data.val_split}
+
+# how many independent scans (each scan = several stacks) to simulate per
+# subject. Each scan re-samples geometry/intensity and has its own GT volume.
+n_scans_per_subject: 1
+
+# simulate + save the segmentation of every stack (sliced like the image
+# stacks, saved next to them as `..._dseg.nii.gz`). Enables the scanner's
+# `scan_segmentations` so the labels are acquired with the same geometry.
+save_stack_segmentations: true
+
+# also save the ground-truth segmentation of the volume the stacks were
+# sampled from, next to the GT reference volume
+save_gt_segmentation: true
+
+# seed for reproducible sampling (numpy/torch/python.random)
+seed: 42

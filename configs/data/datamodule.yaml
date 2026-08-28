@@ -1,0 +1,24 @@
+defaults:
+  - _self_
+  - generator/forstack
+
+_target_: synthgen.data.datamodules.DataModule
+
+# Defaults point at the data roots of configs/paths/default.yaml; every
+# experiment overrides them (see the README, "Reproducing the paper").
+split_file: ${paths.train_data_dir}/participants.csv
+bids_path: ${paths.train_data_dir}
+# Pre-computed intensity seeds for the label-driven synthesis mode; PRISM
+# samples intensities from the reference volumes instead (train_type: real).
+seed_path: null
+train_type: real
+train_split: train
+val_type: real
+val_split: val
+test_split: test
+transforms: null
+num_workers: 8
+batch_size: 1
+img_suffix: T2w
+seg_suffix: dseg
+load_segmentations: true

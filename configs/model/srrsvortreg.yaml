@@ -1,0 +1,35 @@
+_target_: synthgen.models.svort.SRRLightning
+n_iter: 4 
+pe: true
+cg_iter: 5
+freezesvr: false
+# regularizer:
+#   _target_: monai.networks.nets.BasicUNet
+#   spatial_dims: 3
+#   in_channels: 1
+#   out_channels: 1
+#   features: [16, 32, 32, 64, 128, 16]
+#   upsample: pixelshuffle
+perceptual_loss: null
+tvloss: null
+lr: 0.0002
+weight_decay: 0.01
+warmup_steps: 500
+weight_point: 0.1
+weight_img: 1.0
+weight_tv: 10.0
+weight_T: 0.01
+weight_R: 10.0
+weight_perceptual: 0.0
+n_train: 200000
+batch_size: 8
+# Step-by-step training: which task heads are active (and supervised). Stages
+# override this; default = all tasks for back-compat.
+# Add `regconf` to active_tasks to enable the per-slice reliability head: a
+# SVoRT-style softmax-over-slices weight that down-weights unreliable slices in
+# the CG reconstruction, learned unsupervised through the image loss (no weight).
+active_tasks: [motion, bias, intensity, quality]
+# Direct-supervision weights (0 by default; staged configs turn them on).
+weight_intshift: 0.0
+weight_bias: 0.0
+weight_qa: 0.0

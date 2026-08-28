@@ -1,0 +1,152 @@
+# @package _global_
+
+
+defaults:
+  - override /data: datamodule
+  - override /model: srrsvortreg
+  - override /callbacks: default
+  - override /trainer: gpu
+
+task_name: 0reg1ch
+
+model:
+  _target_: synthgen.models.svort.SRRLightningReg
+  # n_iter is unused by the reg-only forward (single PSF->CG->reg->CG pass); kept
+  # for parent compatibility. cg_iter=2 -> both CG solves run 2 iterations.
+  n_iter: 1
+  cg_iter: 2
+  # SVR registration transformers are never run here -> freeze them so only the
+  # regularizer (+ its MoDL proximal weight lambda) trains.
+  freezesvr: true
+  freezerreg: false
+
+  # The SQM is not used while the regularizer is pre-trained on its own.
+  sqm: null
+
+  lr: 5.0e-5
+
+  # --- 50/50 L1 + perceptual on the final reg output --------------------------
+  # L1 is UNMASKED (whole-volume smooth-L1). NOTE: the raw magnitudes of the two
+  # terms differ, so equal weights are a starting point -- rebalance after seeing
+  # loss_imgl1 vs loss_percept if one dominates.
+  weight_img: 500
+  weight_perceptual: 500
+  perceptual_loss:
+    _target_: monai.losses.PerceptualLoss
+    spatial_dims: 3
+    pretrained_path: ${paths.medicalnet_weights}
+    network_type: "medicalnet_resnet10_23datasets"
+    is_fake_3d: False
+    pretrained: True
+
+  tvloss: null
+
+  # Everything else OFF (no pose / quality / bias / intensity supervision here).
+  weight_point: 0.0
+  weight_R: 0.0
+  weight_T: 0.0
+  weight_qa: 0.0
+  weight_intshift: 0.0
+  weight_bias: 0.0
+  weight_dc: 0.0
+  weight_qa_reg: 0.0
+  weight_tv: 0.0
+  weight_gradloss: 0.0
+
+  # Imperfect motion estimation: the GT poses fed to PSF/CG are perturbed by pose
+  # noise sampled uniformly per forward in [0, sigma_max], where sigma_max is
+  # calibrated so the induced point loss reaches ~max_motion_point_loss at the top
+  # of the range (logged each step as point_induced/*).
+  max_motion_point_loss: 5.0
+
+  # MoDL proximal weight lambda (data-consistency vs prior balance), learned. A
+  # SINGLE shared lambda (one CG/reg step in this pipeline).
+  reg_lambda_init: 0.5
+  n_reg_lambda: 1
+
+  # Learned image PRIOR: a SINGLE residual denoiser (ModuleList of one), shared
+  # across the (single) reg step. Quality-conditioned: in_channels=2 takes
+  # [DC reconstruction, per-voxel reliability map]; out_channels=1 is the residual.
+  regularizer:
+    _target_: torch.nn.ModuleList
+    modules:
+      - _target_: synthgen.models.regularizers.DenoisingResUNet3D
+        in_channels: 1
+        out_channels: 1
+        channels: [16, 32, 64, 128]
+        up_sample_mode: pixelshuffle
+        strides: [2, 2, 2]
+
+data:
+  train_type: real
+  val_type: real
+
+  scanner:
+    _target_: synthgen.generator.scanner.Scanner
+    cfg_scanner:
+      resolution_slice_fac: [1.0, 2.0]
+      resolution_slice_max: 2.0
+      slice_thickness: [2.0, 5.0]
+      gap: [2.0, 5.0]
+      resolution_recon: 1.0
+      min_num_stack: 1
+      max_num_stack: 4
+      max_num_slices: 400
+      noise_sigma: [0.0, 0.03]
+      TR: [1, 2]
+      prob_void: 0.2
+      prob_motion: 0.2
+      prob_local_blur: 0.2
+      # Spatially-varying noise: a blob region of a slice gets strong (optionally
+      # correlated) Rician noise while the rest stays clean.
+      prob_local_noise: 0.2
+
+      max_missing_slices: 0.2
+      bias_strength_max: 0.2
+      bias_strength_min: 0.0
+      bias_percentage_max: 0.2
+      intensity_slice_std: 0.3
+      intensity_slice_prb: 0.2
+      skull_strip: 0.5
+      slice_size: 128
+      restrict_transform: false
+      txy: 3
+
+  split_file: ${paths.train_data_dir}/participants.csv
+  bids_path: ${paths.train_data_dir}
+  seed_path: null
+
+  train_split: train
+  val_split: val
+  test_split: test
+  img_suffix: T2wbiascorrected
+  seg_suffix: dseg
+
+  num_workers: 0
+  batch_size: 1
+
+  generator:
+    resolution: [1.0, 1.0, 1.0]
+    shape: [128, 128, 128]
+    image_transforms:
+      _target_: torchio.transforms.Compose
+      transforms:
+        - _target_: torchio.transforms.RandomGamma
+          log_gamma: [-0.4, 0.4]
+          p: 1.0
+        - _target_: torchio.transforms.RescaleIntensity
+          out_min_max: [0, 1]
+
+trainer:
+  max_epochs: 4000
+  min_epochs: 1000
+  check_val_every_n_epoch: 5
+  # fp32: the proximal CG mixes the fp32 lambda parameter with the volume; full
+  # precision keeps the data-consistency solve clean and stable.
+  precision: 32
+  gradient_clip_val: 500.
+  gradient_clip_algorithm: norm
+  accumulate_grad_batches: 8
+
+ckpt_path: null
+ckpt_load_mode: resume
