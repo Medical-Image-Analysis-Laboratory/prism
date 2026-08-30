@@ -20,7 +20,7 @@ inside the SVR loop. One forward pass alternates
 
 <!-- add overview figure below -->
 <div align="center">
-<img src="imgs/overeview.pdf" width="80%" alt="PRISM overview" />
+<img src="imgs/overeview.png" width="80%" alt="PRISM overview" />
 </div>
 
 
