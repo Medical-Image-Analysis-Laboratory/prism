@@ -219,7 +219,7 @@ logs/*
 docs/
 
 *.csv
-*.png
+
 
 # --- PRISM ------------------------------------------------------------------
 # Model weights and predictions are distributed separately, never committed.
